@@ -1,0 +1,44 @@
+﻿
+@using DBLibrary.Model
+@model IEnumerable<PromoItemsVM>
+
+@{
+    ViewBag.Title = "SKUItems";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var sno = 1;
+}
+
+<h2>Promotions </h2>
+
+<table border="1" width="50%">
+    <tr>
+        <th>#</th>
+        <th>Item Name</th>
+        <th>Promotional Qty</th>
+        <th>Fixed Price</th>
+        <th>Group No.</th>
+        <th></th>
+    </tr>
+    @if (Model.Count() > 0)
+    {
+        foreach (var item in Model.OrderBy(x => x.ItemName))
+        {
+            <tr>
+                <td>@sno</td>
+                <td>@item.ItemName</td>
+                <td>@item.PromotionalQty</td>
+                <td>@item.FixedPrice</td>
+                <td>@item.GroupId</td>
+                <td><a href="#">Edit</a></td>
+            </tr>
+            sno++;
+        }
+    }
+    else
+    {
+        <tr>
+            <td colspan="4"> No Records</td>
+        </tr>
+    }
+</table>
+

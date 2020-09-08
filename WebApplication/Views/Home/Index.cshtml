@@ -1,0 +1,122 @@
+﻿@using WebApplication.Models
+
+@{
+    ViewBag.Title = "Home Page";
+    var sessionlist = new List<SessionVM>();
+    if (Session["Itemslist"] != null)
+    {
+        sessionlist = (List<SessionVM>)Session["Itemslist"];
+    }
+    var sno = 1;
+}
+
+<h1>Promomtion Engine Check</h1>
+<button id="btnAddNew" style="float:right;">New</button>
+<br />
+<div class="col-md-12">
+    <label style="width:2%" id="lblSno">#</label>
+    @Html.DropDownList("ItemId", (IEnumerable<SelectListItem>)ViewData["ItemsList"], "Select Item", new { @style = "width:50%;max:width:560px !important;height:25px;" })
+    <input style="width:10%" type="number" id="txtQty" placeholder="Quantity" />
+    <input style="width:10%" type="number" id="txtAmount" placeholder="Amount" disabled />
+    <input style="width:8%" type="button" name="add" value="Add" class="btnadd">
+</div>
+<table border="1" width="100%" id="tblpromo">
+    <tr>
+        <th width="5%">#</th>
+        <th width="55%">Item</th>
+        <th width="20%">Qty</th>
+        <th width="20%">Amount </th>
+    </tr>
+    @foreach (var item in sessionlist)
+    {
+        <tr>
+            <td width="5%">@sno</td>
+            <td width="55%">@item.ItemName</td>
+            <td width="20%">@item.Qty</td>
+            <td width="20%" class="lblAmount">@item.Amount </td>
+        </tr>
+        sno++;
+    }
+</table>
+    <table border="1" width="100%">
+        <tr>
+            <td width="80%" style="text-align:right;">Total</td>
+            <td><label id="lblTotal"></label> </td>
+        </tr>
+    </table>
+    @section scripts{
+        <script>
+            $(document).ready(function () {
+                CalculateTotal();
+            });
+
+            $('#txtQty').blur(function () {
+                var itemId = $('#ItemId').val();
+                var qty = $('#txtQty').val();
+                if (qty == "") {
+                    return false;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/GetItemPrice",
+                    data: '{ItemId:"' + itemId + '",Qty:' + qty + '}',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        $('#txtAmount').val(data.data.Item2);
+
+                    }
+                });
+            });
+
+            $('.btnadd').click(function () {
+                if ($("#ItemId").val() == "") {
+                    alert('Select the item');
+                    return false;
+                }
+                var itemId = $("#ItemId").val();
+                var qty = $('#txtQty').val();
+                var amount = $('#txtAmount').val();
+                var itemname = $("#ItemId option:selected").text();
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/SetItemsSession",
+                    data: '{ItemId:"' + itemId + '",ItemName:"' + itemname + '" ,Qty:' + qty + ',Amount:' + amount + '}',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        window.location.reload(); 
+                    }
+                });
+
+            });
+
+            $('#btnAddNew').click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/ClearSession", 
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        window.location.reload(); 
+                    }
+                });
+            });
+
+            function CalculateTotal() {
+                var total = 0;
+                $('#tblpromo tr').each(function (index) {
+                    console.log(index);
+                    if (index > 0) {
+                        $row = $(this);
+                        total = total + parseFloat($row[0].getElementsByClassName('lblAmount')[0].innerText);
+                    }
+
+                });
+                $('#lblTotal').html(total);
+            }
+
+        </script>
+
+    }

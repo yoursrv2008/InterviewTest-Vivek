@@ -1,0 +1,39 @@
+﻿@using DBLibrary.Entity
+@model IEnumerable<Item>
+
+    @{
+        ViewBag.Title = "SKUItems";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+        var sno = 1;
+    }
+
+    <h2>Items </h2>
+
+    <table border="1" width="50%">
+        <tr>
+            <th>#</th>
+            <th>Item Name</th>
+            <th>Unit Price</th>
+            <th></th>
+        </tr>
+        @if (Model.Count() >0)
+        {
+            foreach(var item in Model.OrderBy(x=>x.ItemName))
+            {
+                <tr>
+                    <td>@sno</td>
+                    <td>@item.ItemName</td>
+                    <td>@item.UnitPrice</td>
+                    <td><a href="#">Edit</a></td>
+                </tr>
+                sno++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4"> No Records</td>
+            </tr>
+        }
+</table>
+
