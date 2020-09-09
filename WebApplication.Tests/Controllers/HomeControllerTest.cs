@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using WebApplication.Models;
 
 namespace WebApplication.Tests.Controllers
@@ -62,7 +63,7 @@ namespace WebApplication.Tests.Controllers
 
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(result, 100, "Scenario B Ok..");
+            Assert.AreEqual(result, 370, "Scenario B Ok..");
         }
 
         List<SessionVM> GetTestScenarioBItems()
@@ -85,14 +86,15 @@ namespace WebApplication.Tests.Controllers
                 SessionVM obj = new SessionVM();
                 obj.ItemId = item.ItemId;
                 obj.Qty = item.Qty;
-                obj.Amount = ProductService.GetItemCalcPrice(item.ItemId, item.Qty, sessionlist).Item2;
-                result += obj.Amount;
                 sessionlist.Add(obj);
+                var calcAmount = ProductService.GetItemCalcPrice(item.ItemId, item.Qty, sessionlist);
+                obj.Amount = calcAmount.Item2; 
+                sessionlist= calcAmount.Item3 ;
             }
-
+            result = sessionlist.Sum(x => x.Amount);
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(result, 100, "Scenario C Ok..");
+            Assert.AreEqual(result, 280, "Scenario C Ok..");
         }
 
         List<SessionVM> GetTestScenarioCItems()
